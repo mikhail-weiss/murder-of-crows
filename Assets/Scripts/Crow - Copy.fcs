@@ -1,0 +1,122 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+
+public class Crow2 : MonoBehaviour
+{
+    public Murder controller;
+    public long maxSpeed = 100;
+
+    internal Rigidbody2D body;
+    internal Vector2 initialPosition;
+
+    //private LineRenderer lr;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        body = GetComponent<Rigidbody2D>();
+        body.position = initialPosition;
+
+        //lr = GetComponent<LineRenderer>();
+
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        if (controller)
+        {
+            Steer();
+            //Vector2 direction = Steer();
+            //Vector2 direction = (controller.target - this.body.position);
+
+            //this.body.velocity = direction * Time.deltaTime * maxSpeed;
+            //lr.SetPosition(0, this.body.position);
+            //lr.SetPosition(1, this.body.position + direction);
+
+            // enforce minimum and maximum speeds for the boids
+            //float speed = body.velocity.magnitude;
+            //if (speed > controller.maxVelocity)
+            //{
+            //    body.velocity = body.velocity.normalized * controller.maxVelocity;
+            //}
+            //else if (speed < controller.minVelocity)
+            //{
+            //    body.velocity = body.velocity.normalized * controller.minVelocity;
+            //}
+        }
+
+    }
+    void OnDrawGizmos()
+    {
+        Gizmos.DrawRay(this.body.position, this.body.velocity);
+    }
+
+    //private void OnTriggerEnter2D(Collider2D collision)
+    //{
+    //    UnityEngine.Debug.Log("Entered " + collision);
+    //    if (collision.gameObject.CompareTag("Prey"))
+    //    {
+
+    //        Destroy(collision.gameObject);
+    //        transform.localScale *= 1.1f;
+    //        Instantiate(crow, body.position * 0.7f, Quaternion.identity);
+    //    }
+    //}
+
+    private void Steer()
+    {
+        //Vector2 randomize = new Vector3((Random.value * 2) - 1, (Random.value * 2) - 1);
+        Vector2 alignment = new Vector2();
+        Vector2 cohesion = new Vector2(0, 0);
+        Vector2 separation = new Vector2(0, 0);
+
+
+        long neighborCount = 0;
+
+        Crow[] crows = controller.GetComponentsInChildren<Crow>();
+
+        foreach (Crow crow in crows)
+        {
+            if (crow != this)
+            {
+                
+                alignment += crow.body.velocity;
+                cohesion += crow.body.position;
+                if (Vector2.Distance(crow.body.position, this.body.position) < 1)
+                {
+                    Debug.Log("Too close");
+
+                    separation += crow.body.position - this.body.position;
+                }
+                neighborCount++;
+                
+            }
+        }
+
+        alignment /= neighborCount;
+        alignment.Normalize();
+
+        cohesion /= neighborCount;
+        cohesion -= this.body.position;
+        cohesion.Normalize();
+
+        separation /= neighborCount;
+        separation *= -1;
+        separation.Normalize();
+
+        Vector2 flocking = alignment*1 + separation*1 + cohesion*1;
+        Vector2 noise = (new Vector2((Random.value * 2) - 1, (Random.value * 2) - 1)).normalized;
+        Vector2 target = (controller.target - this.body.position).normalized;
+
+
+        //this.body.AddForce(flocking*4);
+        //this.body.AddForce(0.3f * target);
+        this.body.AddForce(noise);
+
+
+        //return noise.normalized * 0 + flocking.normalized*2 + target.normalized * 1;
+    }
+
+}
