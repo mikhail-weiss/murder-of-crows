@@ -7,7 +7,7 @@ public class Crow : MonoBehaviour
     public Vector3 baseRotation;
 
     [Range(0, 10)]
-    public float maxSpeed = 1f;
+    public float maxSpeed = 3.33f;
 
     [Range(.1f, .5f)]
     public float maxForce = .03f;
@@ -15,8 +15,8 @@ public class Crow : MonoBehaviour
     [Range(.1f, 10)]
     public float neighborhoodRadius = 3f;
 
-    [Range(0, 50)]
-    public float separationAmount = 100f;
+    [Range(0, 3)]
+    public float separationAmount = 1f;
 
     [Range(0, 3)]
     public float cohesionAmount = 1f;
@@ -26,6 +26,7 @@ public class Crow : MonoBehaviour
 
     public Vector3 acceleration;
     public Vector3 velocity;
+    private Animator animator;
 
     private Vector3 Position
     {
@@ -41,12 +42,13 @@ public class Crow : MonoBehaviour
 
     private void Start()
     {
-        var animator = GetComponent<Animator>();
+        animator = GetComponent<Animator>();
         animator.SetFloat("animationStart", Random.value);
         
-        float angle = Random.Range(0, Mathf.PI/2);
-        transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle) + baseRotation);
+        float angle = Random.Range(2*Mathf.PI , 0);
+        //transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle) + baseRotation);
         velocity = new Vector2(Mathf.Cos(angle), Mathf.Sin(angle));
+
     }
 
     private void Update()
@@ -61,6 +63,8 @@ public class Crow : MonoBehaviour
         UpdatePosition();
         UpdateRotation();
         WrapAround();
+        this.animator.SetFloat("horizontal", velocity.x);
+        this.animator.SetFloat("vertical", velocity.y);
     }
 
     private void OnDrawGizmos()
@@ -130,7 +134,7 @@ public class Crow : MonoBehaviour
     private void UpdateRotation()
     {
         var angle = Mathf.Atan2(velocity.y, velocity.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle) + baseRotation);
+        //transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle) + baseRotation);
     }
 
     private Vector2 Alignment(IEnumerable<Crow> boids)

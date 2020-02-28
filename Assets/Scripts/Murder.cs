@@ -29,6 +29,10 @@ public class Murder : MonoBehaviour
                             Random.value * GetComponent<Collider2D>().bounds.size.y,
                             Random.value-0.5f);
             Crow boid = Instantiate(prefab, initialPosition, transform.rotation) as Crow;
+
+            boid.maxForce = boid.maxForce * (1 + (Random.value * 0.1f));
+            boid.maxSpeed = boid.maxSpeed * (1 + (Random.value * 0.1f));
+
             boid.transform.parent = transform;
             
             //boid.controller = this;            
